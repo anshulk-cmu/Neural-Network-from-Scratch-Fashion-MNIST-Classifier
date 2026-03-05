@@ -1,0 +1,14 @@
+hw3/10701_S26_HW3/
+hw3/Programming/__MACOSX/
+hw3/10701_S26_HW3.pdf
+.vscode/
+
+# Python cache
+**/__pycache__/
+*.pyc
+
+# Downloaded datasets
+**/FashionMNIST/
+
+# macOS
+**/.DS_Store
