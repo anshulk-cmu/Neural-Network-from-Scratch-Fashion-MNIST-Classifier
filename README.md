@@ -791,7 +791,7 @@ python base_experiment.py
 
 ## Results
 
-> **Status:** 🔄 Run in progress — Q1–Q7 ✅ complete, Q8–Q9 ✅ complete, Q10 🔄 running, Q13 ⏳ pending.
+> **Status:** Q1 – Q13 ✅ complete.
 
 ### Numerical Answers (Q1–Q7)
 
