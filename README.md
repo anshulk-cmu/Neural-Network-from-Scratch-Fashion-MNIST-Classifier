@@ -660,10 +660,10 @@ Both have:
 ### 8.3 — Written Answers for Q11 and Q12
 
 **Q11 (effect of batch size + learning rate relationship):**
-> Larger batch sizes converge more slowly with a fixed learning rate because each SGD step averages gradients over more samples, effectively reducing the per-update step size. To compensate, the learning rate should be scaled proportionally to the batch size (linear scaling rule).
+> Larger batch sizes converge significantly slower with a fixed learning rate. At epoch 50: bs=10 reached 0.2942/0.3669 (train/test), bs=50 reached 0.4113/0.4500, and bs=100 reached 0.4798/0.5086. This happens because our loss function averages gradients over the batch (divides by $N$), so the effective step size is $\eta/B$. Doubling batch size halves the per-update learning rate. To compensate, the learning rate should be scaled proportionally — the "linear scaling rule."
 
 **Q12 (best next step):**
-> The best next step is to increase the learning rate proportionally to the batch size (e.g., lr=0.05 for batch_size=50, lr=0.1 for batch_size=100) so that larger-batch models converge at a comparable rate. Alternatively, training for more epochs would allow the larger-batch models to eventually reach similar loss levels.
+> The best next step is to increase the learning rate proportionally to the batch size. Since bs=10 with lr=0.01 converges well (test loss 0.3669), we should use lr=0.05 for bs=50 and lr=0.1 for bs=100 to match the effective step size $\eta/B = 0.001$. Our Q13 data confirms this works: LR=0.001 with bs=5 ($\eta/B=0.0002$) produced nearly identical results to Q10's bs=50 with lr=0.01 ($\eta/B=0.0002$) — final test losses of 0.4499 vs 0.4500.
 
 ---
 
@@ -723,10 +723,10 @@ Saves to `q13_learning_rate_experiment.png` at 150 DPI.
 **(c) Fixed settings:** Batch size = 5, Epochs = 50, Hidden layer width = 256, Initial weights = weights.pt, Optimizer = SGD (no momentum), No data shuffling
 
 **(d) Analysis of results:**
-- **lr = 0.001** converges very slowly — after 50 epochs, both training and test loss remain relatively high. The small step size means the model barely moves in parameter space each update, requiring many more epochs to reach a good solution.
-- **lr = 0.01** (our baseline) shows steady, reliable convergence. Training and test losses decrease consistently across epochs without instability, striking a good balance between speed and stability.
-- **lr = 0.1** converges much faster in the early epochs, reaching lower loss values quickly. However, the larger step size may cause oscillation around the minimum — the loss curve can be noisier or even diverge if the learning rate overshoots the loss landscape's curvature. If test loss starts increasing while training loss decreases, this indicates overfitting amplified by aggressive updates.
-- The learning rate controls the magnitude of each weight update (Δθ = −lr · ∇L). Too small wastes computation; too large risks instability. The optimal learning rate depends on the loss surface geometry and the batch size — larger batches produce smoother gradients that can tolerate higher learning rates.
+- **lr = 0.001** converges very slowly — final train/test loss of 0.4112/0.4499 after 50 epochs, comparable to where lr=0.01 is at epoch ~4. The small step size means the model needs far more epochs to reach a good solution. The tiny train-test gap (0.0387) shows no overfitting — the model is underfitting.
+- **lr = 0.01** (our baseline) shows steady, reliable convergence to 0.2416/0.3452. Train and test losses decrease consistently across all 50 epochs without instability. The moderate generalization gap (0.1036) indicates mild overfitting but the test loss is still decreasing — more epochs would help.
+- **lr = 0.1** converges fastest initially (reaching 0.2293/0.3605 by epoch 17) but then **overfits dramatically**: train loss continues dropping to 0.1943 while test loss reverses direction from its minimum of 0.3563 (epoch 13) and climbs to 0.4968 by epoch 50 — a gap of 0.3025. The aggressive updates push the model into sharp minima that generalize poorly.
+- **Conclusion:** lr = 0.01 achieves the best test loss (0.3452), making it the optimal choice. There is a clear bias-variance tradeoff across learning rates: lr=0.001 underfits (high bias), lr=0.1 overfits (high variance), and lr=0.01 balances both.
 
 ---
 
@@ -829,8 +829,6 @@ python base_experiment.py
 **Summary:** Train loss dropped 44.7% (0.4417 → 0.2444), test loss dropped 29.2% (0.4814 → 0.3410), test accuracy reached **88.01%**. Generalization gap grew from 0.040 to 0.097, indicating mild overfitting in later epochs. Diminishing returns clearly visible — epoch 1→2 gained +1.77% accuracy, epoch 14→15 gained only +0.06%.
 
 ### Plots
-
-> Images will render once the script completes and generates the `.png` files.
 
 #### Q8 — Confusion Matrices (Train + Test)
 
