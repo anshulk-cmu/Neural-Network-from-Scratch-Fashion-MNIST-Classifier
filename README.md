@@ -623,7 +623,7 @@ for bs in batch_sizes:
 - 3 complete training runs: 50 training-loss values + 50 test-loss values each
 - SGD steps per epoch: 6,000 (bs=10), 1,200 (bs=50), 600 (bs=100)
 
-**`compute_avg_loss()` helper:** A reusable function that computes average cross-entropy over any dataset with `torch.no_grad()`, using numerically stable log-softmax. Eliminates code duplication across q7, q10, and q13.
+**`compute_avg_loss()` helper:** A reusable function that computes average cross-entropy over any dataset with `torch.no_grad()`, using numerically stable log-softmax. Used by `q10()` and `q13()` to compute epoch-end metrics.
 
 ```python
 def compute_avg_loss(model, dataset, batch_size, device):
@@ -734,21 +734,9 @@ Saves to `q13_learning_rate_experiment.png` at 150 DPI.
 
 ### 10.1 — Numerical Answers for Written PDF
 
-| Question | Answer | Type |
-|----------|--------|------|
-| Q1 | a₁₀ for first data point | Float (4 d.p.) |
-| Q2 | z₂₀ for first data point | Float (4 d.p.) |
-| Q3 | Predicted class for first data point | Integer (0–9) |
-| Q4 | 10 bias values of output layer after epoch 3 | List of 10 floats (4 d.p.) |
-| Q5 | Test loss at end of each of 15 epochs | List of 15 floats (4 d.p.) |
-| Q6 | Test accuracy at end of each of 15 epochs | List of 15 floats (4 d.p.) |
-| Q7 | Final training loss + test accuracy (50 epochs, bs=5) | 2 floats (4 d.p.) |
-
-All printed by the script at runtime — copy into LaTeX boxes.
+All Q1–Q7 values are printed by the script at runtime and recorded in the [Results](#results) section. Copy directly into LaTeX answer boxes (all rounded to 4 decimal places).
 
 ### 10.2 — Plots for Written PDF
-
-All plots are saved to `nn_implementation_code/` and rendered in the [Results → Plots](#plots) section below.
 
 | Question | Plot File | Content |
 |----------|-----------|---------|
@@ -789,8 +777,8 @@ python base_experiment.py
 |---------|---------------|---------------|--------|-----------|-------------|------------|
 | Q1–Q6 (bs=1) | 60,000 | Per-epoch (bs=1 over 70k samples) | 15 | ~25–30 min | **~16.5 min** ✅ | eval uses bs=1 too |
 | Q7 (bs=5) | 12,000 | Final only (no per-epoch eval) | 50 | ~10–15 min | **~16 min** ✅ | training only |
-| Q8–Q9 | — | Forward-only (bs=100 / sequential) | — | < 1 min | _pending_ | negligible |
-| Q10 (bs=10,50,100) | 6k / 1.2k / 600 | Per-epoch (same bs) | 3 × 50 | ~12–18 min | _pending_ | bs=10 dominates |
+| Q8–Q9 | — | Forward-only (bs=100 / sequential) | — | < 1 min | **< 10 sec** ✅ | negligible |
+| Q10 (bs=10,50,100) | 6k / 1.2k / 600 | Per-epoch (same bs) | 3 × 50 | ~12–18 min | **~15 min** ✅ | bs=10 dominates |
 | Q13 (bs=5, 3 LRs) | 12,000 | Per-epoch (bs=5 over 70k) | 3 × 50 | ~45–60 min | _pending_ | eval over 60k at bs=5 |
 
 **Why Q13 dominates:** Each of the 150 total epochs evaluates `compute_avg_loss` over 60,000 training + 10,000 test samples at batch_size=5, producing 14,000 forward passes per epoch just for metrics.
@@ -803,20 +791,20 @@ python base_experiment.py
 
 ## Results
 
-> **Status:** 🔄 Run in progress — Q1–Q6 ✅ complete, Q7 🔄 running, Q8–Q13 ⏳ pending.
+> **Status:** 🔄 Run in progress — Q1–Q7 ✅ complete, Q8–Q9 ✅ complete, Q10 🔄 running, Q13 ⏳ pending.
 
 ### Numerical Answers (Q1–Q7)
 
 | Question | Description | Value |
 |----------|-------------|-------|
-| **Q1** | a₁₀ (10th pre-activation, first image, before training) | **1.469** |
-| **Q2** | z₂₀ (20th sigmoid activation, first image, before training) | **0.8168** |
-| **Q3** | Predicted class for first image (before any SGD updates) | **8** (Bag) — the true label is 9 (Ankle boot); the model misclassifies before training |
+| **Q1** | a₁₀ (10th pre-activation, first image, before first SGD update) | **1.4690** |
+| **Q2** | z₂₀ (20th sigmoid activation, first image, before first SGD update) | **0.8168** |
+| **Q3** | Predicted class for first image (before first SGD update) | **8** (Bag) — true label is 9 (Ankle boot); model misclassifies with initial weights |
 | **Q4** | Output layer biases after epoch 3 (10 values) | `[-0.0028, 0.0576, -0.1956, 0.2243, 0.1428, -0.1768, 0.0777, 0.1322, -0.2028, -0.0565]` |
 | **Q5** | Test loss per epoch (15 values) | See training curves table below |
 | **Q6** | Test accuracy per epoch (15 values) | See training curves table below |
-| **Q7 Loss** | Final training loss (50 epochs, bs=5) | 🔄 _running_ |
-| **Q7 Acc** | Final test accuracy (50 epochs, bs=5) | 🔄 _running_ |
+| **Q7 Loss** | Final training loss (50 epochs, bs=5) | **0.2416** |
+| **Q7 Acc** | Final test accuracy (50 epochs, bs=5) | **0.8777** (87.77%) |
 
 ### Training Curves (Q1–Q6: batch_size=1, 15 epochs, lr=0.01)
 
@@ -864,9 +852,9 @@ python base_experiment.py
 
 | Batch Size | Epochs | Final Train Loss | Final Test Loss |
 |------------|--------|-----------------|-----------------|
-| 10 | 50 | _pending_ | _pending_ |
-| 50 | 50 | _pending_ | _pending_ |
-| 100 | 50 | _pending_ | _pending_ |
+| 10 | 50 | **0.2942** | **0.3669** |
+| 50 | 50 | **0.4113** | **0.4500** |
+| 100 | 50 | **0.4798** | **0.5086** |
 
 ### Q13 Learning Rate Experiment Results
 

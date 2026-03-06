@@ -196,7 +196,7 @@ def q7(model: FashionMNISTModel, trainset: torchvision.datasets, testset: torchv
 
     test_accuracy = round(correct / total, 4)
 
-    print(f"Final Training Loss: {avg_train_loss}, Final Test Accuracy: {test_accuracy}")
+    print(f"Final Training Loss: {avg_train_loss:.4f}, Final Test Accuracy: {test_accuracy:.4f}")
     return avg_train_loss, test_accuracy
 
 
@@ -254,7 +254,7 @@ def q8(model: FashionMNISTModel, trainset: torchvision.datasets, testset: torchv
 
     plt.tight_layout()
     plt.savefig('q8_confusion_matrices.png', dpi=150, bbox_inches='tight')
-    plt.show()
+    plt.close()
     print("Saved confusion matrices to q8_confusion_matrices.png")
 
 
@@ -301,7 +301,7 @@ def q9(model: FashionMNISTModel, testset: torchvision.datasets, device=torch.dev
     plt.suptitle('Q9: First Misclassified Test Image per Class', fontsize=14)
     plt.tight_layout()
     plt.savefig('q9_first_misclassified.png', dpi=150, bbox_inches='tight')
-    plt.show()
+    plt.close()
     print("Saved first misclassified images to q9_first_misclassified.png")
 
 
@@ -391,7 +391,7 @@ def q10(trainset: torchvision.datasets, testset: torchvision.datasets, lr=0.01, 
 
     plt.tight_layout()
     plt.savefig('q10_batch_size_experiments.png', dpi=150, bbox_inches='tight')
-    plt.show()
+    plt.close()
     print("Saved batch size experiment plots to q10_batch_size_experiments.png")
 
     return results
@@ -474,7 +474,7 @@ def q13(trainset: torchvision.datasets, testset: torchvision.datasets, epochs=50
 
     plt.tight_layout()
     plt.savefig('q13_learning_rate_experiment.png', dpi=150, bbox_inches='tight')
-    plt.show()
+    plt.close()
     print("Saved learning rate experiment plots to q13_learning_rate_experiment.png")
 
     return results
@@ -499,12 +499,12 @@ if __name__ == "__main__":
     print("\n" + "="*60)
     print("ANSWERS Q1–Q6")
     print("="*60)
-    print(f"Q1 (a_10):           {Q1}")
-    print(f"Q2 (z_20):           {Q2}")
+    print(f"Q1 (a_10):           {Q1:.4f}")
+    print(f"Q2 (z_20):           {Q2:.4f}")
     print(f"Q3 (predicted class): {Q3}")
-    print(f"Q4 (beta biases):    {Q4}")
-    print(f"Q5 (test losses):    {Q5}")
-    print(f"Q6 (test accuracy):  {Q6}")
+    print(f"Q4 (beta biases):    [{', '.join(f'{v:.4f}' for v in Q4)}]")
+    print(f"Q5 (test losses):    [{', '.join(f'{v:.4f}' for v in Q5)}]")
+    print(f"Q6 (test accuracy):  [{', '.join(f'{v:.4f}' for v in Q6)}]")
 
     # ===== Q7: batch_size=5, 50 epochs =====
     model = FashionMNISTModel().to(device)
@@ -513,8 +513,8 @@ if __name__ == "__main__":
     print("\n" + "="*60)
     print("ANSWERS Q7")
     print("="*60)
-    print(f"Q7 Training Loss:    {Q7_loss}")
-    print(f"Q7 Test Accuracy:    {Q7_accuracy}")
+    print(f"Q7 Training Loss:    {Q7_loss:.4f}")
+    print(f"Q7 Test Accuracy:    {Q7_accuracy:.4f}")
 
     # ===== Q8: Confusion matrices (uses Q7-trained model) =====
     q8(model, trainset, testset, device=device)
