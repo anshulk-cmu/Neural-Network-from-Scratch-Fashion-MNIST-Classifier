@@ -779,7 +779,7 @@ python base_experiment.py
 | Q7 (bs=5) | 12,000 | Final only (no per-epoch eval) | 50 | ~10–15 min | **~16 min** ✅ | training only |
 | Q8–Q9 | — | Forward-only (bs=100 / sequential) | — | < 1 min | **< 10 sec** ✅ | negligible |
 | Q10 (bs=10,50,100) | 6k / 1.2k / 600 | Per-epoch (same bs) | 3 × 50 | ~12–18 min | **~15 min** ✅ | bs=10 dominates |
-| Q13 (bs=5, 3 LRs) | 12,000 | Per-epoch (bs=5 over 70k) | 3 × 50 | ~45–60 min | _pending_ | eval over 60k at bs=5 |
+| Q13 (bs=5, 3 LRs) | 12,000 | Per-epoch (bs=5 over 70k) | 3 × 50 | ~45–60 min | **~40 min** ✅ | eval over 60k at bs=5 |
 
 **Why Q13 dominates:** Each of the 150 total epochs evaluates `compute_avg_loss` over 60,000 training + 10,000 test samples at batch_size=5, producing 14,000 forward passes per epoch just for metrics.
 
@@ -860,9 +860,9 @@ python base_experiment.py
 
 | Learning Rate | Epochs | Final Train Loss | Final Test Loss |
 |---------------|--------|-----------------|-----------------|
-| 0.001 | 50 | _pending_ | _pending_ |
-| 0.01 | 50 | _pending_ | _pending_ |
-| 0.1 | 50 | _pending_ | _pending_ |
+| 0.001 | 50 | **0.4112** | **0.4499** |
+| 0.01 | 50 | **0.2416** | **0.3452** |
+| 0.1 | 50 | **0.1943** | **0.4968** |
 
 ---
 
